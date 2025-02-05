@@ -29,7 +29,7 @@ func main() {
 	for _, p := range people {
 		for _, other := range people {
 			score := findupes.GetScore(p, other)
-			if accuracy := findupes.GetAccuracy(score); accuracy != "" {
+			if accuracy := findupes.GetAccuracy(score); accuracy != nil {
 				fmt.Println(p.ID, p.FullName(), p.Email, "|", other.ID, other.FullName(), other.Email, "=", accuracy, fmt.Sprintf("(%.2f)", score))
 			}
 		}

@@ -10,3 +10,10 @@ const (
 	zip      csv.Column = "postalZip"
 	addr     csv.Column = "address"
 )
+
+const (
+	Low   Accuracy = "Low"
+	Mid   Accuracy = "Mid"
+	Hi    Accuracy = "High"
+	Match Accuracy = "Match"
+)

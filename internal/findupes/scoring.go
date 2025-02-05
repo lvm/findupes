@@ -2,53 +2,84 @@ package findupes
 
 import "github.com/lvm/findupes/pkg/csv"
 
-func GetScore(person, other Person) float64 {
+type (
+	Score    float64
+	Accuracy string
+)
+
+func (s *Score) Sum(v Score) {
+	*s += v
+}
+
+func (s Score) Lte(v Score) bool {
+	return s <= v
+}
+
+func (s Score) Gte(v Score) bool {
+	return s >= v
+}
+
+func (s Score) Eq(v Score) bool {
+	return s == v
+}
+
+func (a Accuracy) String() string {
+	return string(a)
+}
+
+func GetScore(person, other Person) Score {
 	if person.ID == other.ID {
 		return 1.0
 	}
 
-	values := map[csv.Column]float64{
-		name:     0.25,
-		lastName: 0.25,
-		email:    0.3,
-		zip:      0.1,
-		addr:     0.1,
+	values := map[csv.Column]Score{
+		name:     Score(0.25),
+		lastName: Score(0.25),
+		email:    Score(0.3),
+		zip:      Score(0.1),
+		addr:     Score(0.1),
 	}
 
-	var score float64
+	var score Score
 
 	if person.name == other.name {
-		score += values[name]
+		score.Sum(values[name])
 	}
 
 	if person.lastName == other.lastName {
-		score += values[lastName]
+		score.Sum(values[lastName])
 	}
 
 	if person.Email == other.Email {
-		score += values[email]
+		score.Sum(values[email])
 	}
 
 	if person.Zip == other.Zip {
-		score += values[zip]
+		score.Sum(values[zip])
 	}
 
 	if person.Address == other.Address {
-		score += values[addr]
+		score.Sum(values[addr])
 	}
 
 	return score
 }
 
-func GetAccuracy(score float64) string {
+func GetAccuracy(score Score) *Accuracy {
+	var acc Accuracy
+
 	switch {
-	case score > 0.25 && score < 0.5:
-		return "Low"
-	case score > 0.25 && score < 0.5:
-		return "Mid"
-	case score > 0.25 && score < 0.5:
-		return "High"
+	case score.Gte(0.25) && score.Lte(0.49):
+		acc = Low
+	case score.Gte(0.5) && score.Lte(0.74):
+		acc = Mid
+	case score.Gte(0.75) && score.Lte(0.9):
+		acc = Hi
+	case score.Eq(1.0):
+		acc = Match
 	default:
-		return ""
+		return nil
 	}
+
+	return &acc
 }
