@@ -2,6 +2,7 @@ package findupes
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/lvm/findupes/pkg/csv"
 )
@@ -40,4 +41,26 @@ func NewPeople(rows []csv.Row) People {
 
 func (p Person) FullName() string {
 	return fmt.Sprintf("%s %s", p.name, p.lastName)
+}
+
+func (p Person) Username() string {
+	if p.Email == "" {
+		return ""
+	}
+
+	parts := strings.Split(p.Email, "@")
+	return parts[0]
+}
+
+func (p Person) Compare(people People) Results {
+	results := make(Results, 0)
+
+	for _, other := range people {
+		score := GetScore(p, other)
+		if accuracy := GetAccuracy(score); accuracy != nil {
+			results = append(results, NewResult(p.ID, other.ID, *accuracy))
+		}
+	}
+
+	return results
 }

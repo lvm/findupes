@@ -9,6 +9,10 @@ const (
 	email    csv.Column = "email"
 	zip      csv.Column = "postalZip"
 	addr     csv.Column = "address"
+
+	// non csv columns, but used for scoring
+	fullName csv.Column = "fullName"
+	bonus    csv.Column = "bonus"
 )
 
 const (

@@ -11,6 +11,10 @@ func (s *Score) Sum(v Score) {
 	*s += v
 }
 
+func (s Score) Half() Score {
+	return s / 2
+}
+
 func (s Score) Lte(v Score) bool {
 	return s <= v
 }
@@ -33,25 +37,30 @@ func GetScore(person, other Person) Score {
 	}
 
 	values := map[csv.Column]Score{
-		name:     Score(0.25),
-		lastName: Score(0.25),
+		fullName: Score(0.45),
 		email:    Score(0.3),
 		zip:      Score(0.1),
 		addr:     Score(0.1),
+		bonus:    Score(0.05),
 	}
 
 	var score Score
 
-	if person.name == other.name {
-		score.Sum(values[name])
+	if person.FullName() == other.FullName() {
+		score.Sum(values[fullName])
 	}
 
-	if person.lastName == other.lastName {
-		score.Sum(values[lastName])
-	}
+	if person.Email != "" && other.Email == "" {
+		if person.Email == other.Email {
+			score.Sum(values[email])
+		} else if person.Username() == other.Username() {
+			score.Sum(values[email].Half())
+		}
 
-	if person.Email == other.Email {
-		score.Sum(values[email])
+		// extra score if name and email matches.
+		if person.Email == other.Email && person.FullName() == other.FullName() {
+			score.Sum(values[bonus])
+		}
 	}
 
 	if person.Zip == other.Zip {

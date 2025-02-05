@@ -24,15 +24,14 @@ func main() {
 		return
 	}
 
+	dupes := make([][]string, 0)
 	people := findupes.NewPeople(rows)
+	for _, person := range people {
+		dupes = append(dupes, person.Compare(people).Export()...)
+	}
 
-	for _, p := range people {
-		for _, other := range people {
-			score := findupes.GetScore(p, other)
-			if accuracy := findupes.GetAccuracy(score); accuracy != nil {
-				fmt.Println(p.ID, p.FullName(), p.Email, "|", other.ID, other.FullName(), other.Email, "=", accuracy, fmt.Sprintf("(%.2f)", score))
-			}
-		}
+	for _, dp := range dupes {
+		fmt.Println(dp)
 	}
 
 }
