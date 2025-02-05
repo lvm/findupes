@@ -10,7 +10,10 @@ type Column string
 type Header []Column
 type Row map[Column]string
 
-var ErrNotEnoughData = errors.New("csv seems to be empty")
+var (
+	ErrNoFilename    = errors.New("no filename")
+	ErrNotEnoughData = errors.New("csv seems to be empty")
+)
 
 func NewHeader(cols ...string) Header {
 	header := make(Header, len(cols))
@@ -23,6 +26,9 @@ func NewHeader(cols ...string) Header {
 }
 
 func Reader(filename string) ([]Row, error) {
+	if filename == "" {
+		return nil, ErrNoFilename
+	}
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -52,4 +58,31 @@ func Reader(filename string) ([]Row, error) {
 	}
 
 	return rows, nil
+}
+
+func Writer(filename string, content [][]string) error {
+	if filename == "" {
+		return ErrNoFilename
+	}
+
+	var file *os.File
+
+	if filename == "-" {
+		file = os.Stdout
+	} else {
+		file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+	}
+
+	writer := csv.NewWriter(file)
+	if err := writer.WriteAll(content); err != nil {
+		return err
+	}
+
+	writer.Flush()
+
+	return writer.Error()
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 
 	"github.com/lvm/findupes/internal/findupes"
@@ -20,7 +19,7 @@ func main() {
 
 	rows, err := csv.Reader(*filename)
 	if err != nil {
-		log.Printf("[Error] Reading CSV Failed: %v", err)
+		log.Printf("[Error] Reading CSV Failed: %v\n", err)
 		return
 	}
 
@@ -30,8 +29,8 @@ func main() {
 		dupes = append(dupes, person.Compare(people).Export()...)
 	}
 
-	for _, dp := range dupes {
-		fmt.Println(dp)
+	if err := csv.Writer("-", dupes); err != nil {
+		log.Printf("[Error] failed to write CSV: %v\n", err)
 	}
 
 }
