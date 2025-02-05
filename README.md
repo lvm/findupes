@@ -1,6 +1,10 @@
 # `findupes`
 
-## Build and Usage 
+## Testing, Building and Usage 
+
+```go
+go test -v ./...
+```
 
 ```go
 go build -o findupes .
