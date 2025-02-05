@@ -3,7 +3,7 @@ package csv
 import (
 	"encoding/csv"
 	"errors"
-	"os"
+	"io"
 )
 
 type (
@@ -27,12 +27,12 @@ func NewHeader(cols ...string) Header {
 	return header
 }
 
-func Reader(file *os.File) ([]Row, error) {
-	if file == nil {
+func Reader(r io.Reader) ([]Row, error) {
+	if r == nil {
 		return nil, ErrNoFile
 	}
 
-	reader := csv.NewReader(file)
+	reader := csv.NewReader(r)
 	lines, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
@@ -56,17 +56,16 @@ func Reader(file *os.File) ([]Row, error) {
 	return rows, nil
 }
 
-func Writer(file *os.File, content [][]string) error {
-	if file == nil {
+func Writer(w io.Writer, content [][]string) error {
+	if w == nil {
 		return ErrNoFile
 	}
 
-	writer := csv.NewWriter(file)
+	writer := csv.NewWriter(w)
 	if err := writer.WriteAll(content); err != nil {
 		return err
 	}
 
 	writer.Flush()
-
 	return writer.Error()
 }

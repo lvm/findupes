@@ -1,17 +1,17 @@
 package findupes
 
 import (
+	"io"
 	"log"
-	"os"
 
 	"github.com/lvm/findupes/pkg/csv"
 )
 
-type Importer func(f *os.File) ([]csv.Row, error)
-type Exporter func(f *os.File, content [][]string) error
+type Importer func(r io.Reader) ([]csv.Row, error)
+type Exporter func(w io.Writer, content [][]string) error
 
-func Process(importer Importer, ifile *os.File, exporter Exporter, efile *os.File) error {
-	rows, err := importer(ifile)
+func Process(importer Importer, rbuff io.Reader, exporter Exporter, wbuff io.Writer) error {
+	rows, err := importer(rbuff)
 	if err != nil {
 		log.Printf("[Error] Reading CSV failed: %v\n", err)
 		return err
@@ -23,7 +23,7 @@ func Process(importer Importer, ifile *os.File, exporter Exporter, efile *os.Fil
 		dupes = append(dupes, person.Compare(people).Export()...)
 	}
 
-	if err := exporter(efile, dupes); err != nil {
+	if err := exporter(wbuff, dupes); err != nil {
 		log.Printf("[Error] failed to write CSV: %v\n", err)
 	}
 
