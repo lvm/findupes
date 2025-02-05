@@ -8,6 +8,7 @@ import (
 )
 
 type (
+	// Each Person represents a row in the data provided
 	Person struct {
 		ID             string
 		name, lastName string
@@ -52,6 +53,10 @@ func (p Person) Username() string {
 	return parts[0]
 }
 
+/*
+As said in io.go, this "method", obtains the Score as the result of the comparison of two Persons.
+Each score go from 0.0, to 1.0, no match at all to an exact match. Based on this score, obtains an Accuracy.
+*/
 func (p Person) Compare(people People) Results {
 	results := make(Results, 0)
 

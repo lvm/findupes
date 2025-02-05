@@ -1,6 +1,7 @@
 package findupes
 
 type (
+	// Result is a simple representation for the output Row
 	Result struct {
 		SourceID string
 		MatchID  string

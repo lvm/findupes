@@ -31,6 +31,10 @@ func (a Accuracy) String() string {
 	return string(a)
 }
 
+/*
+As mentioned in people.go, GetScore will compare each Person.{field} to other Person.{field} value, in a pretty rudimentary manner (due to time constraint).
+Each match, will increase it's Score, going from 0.0 to 1.0.
+*/
 func GetScore(person, other Person) Score {
 	if person.ID == other.ID {
 		return 1.0
@@ -74,6 +78,9 @@ func GetScore(person, other Person) Score {
 	return score
 }
 
+/*
+Based on a given Score, this function returns an Accuracy: None (nil), Low, Medium, High, Match.
+*/
 func GetAccuracy(score Score) *Accuracy {
 	var acc Accuracy
 
