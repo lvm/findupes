@@ -3,34 +3,48 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/lvm/findupes/internal/findupes"
 	"github.com/lvm/findupes/pkg/csv"
 )
 
 func main() {
-	filename := flag.String("file", "", "CSV Filename")
+	var (
+		ifile, efile         *os.File
+		importCSV, exportCSV *string
+		err                  error
+	)
+
+	importCSV = flag.String("import", "", "CSV Import")
+	exportCSV = flag.String("export", "-", "CSV Export (default: stdout)")
 	flag.Parse()
 
-	if *filename == "" {
-		log.Println("[Error] Missing `filename`")
+	if *importCSV == "" {
+		log.Println("[Error] Missing input CSV file")
 		return
 	}
 
-	rows, err := csv.Reader(*filename)
+	ifile, err = os.Open(*importCSV)
 	if err != nil {
-		log.Printf("[Error] Reading CSV Failed: %v\n", err)
+		log.Printf("[Error] Opening input CSV file failed: %v\n", err)
 		return
 	}
+	defer ifile.Close()
 
-	dupes := make([][]string, 0)
-	people := findupes.NewPeople(rows)
-	for _, person := range people {
-		dupes = append(dupes, person.Compare(people).Export()...)
+	if *exportCSV == "-" {
+		efile = os.Stdout
+	} else {
+		efile, err = os.OpenFile(*exportCSV, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		if err != nil {
+			log.Printf("[Error] Opening output CSV file failed: %v\n", err)
+		}
+		defer efile.Close()
 	}
 
-	if err := csv.Writer("-", dupes); err != nil {
-		log.Printf("[Error] failed to write CSV: %v\n", err)
+	if err := findupes.Process(csv.Reader, ifile, csv.Writer, efile); err != nil {
+		log.Printf("[Error] Something went wrong processing the Contacts: %v\n", err)
+		return
 	}
 
 }
