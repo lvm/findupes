@@ -17,6 +17,29 @@ const (
 	addr     csv.Column = "address"
 )
 
+type Person struct {
+	ID             string
+	name, lastName string
+	Email          string
+	Zip, Address   string
+}
+
+func NewPerson(row csv.Row) Person {
+	p := new(Person)
+	p.ID = row[id]
+	p.name = row[name]
+	p.lastName = row[lastName]
+	p.Email = row[email]
+	p.Zip = row[zip]
+	p.Address = row[addr]
+
+	return *p
+}
+
+func (p Person) FullName() string {
+	return fmt.Sprintf("%s %s", p.name, p.lastName)
+}
+
 func main() {
 	filename := flag.String("file", "", "CSV Filename")
 	flag.Parse()
@@ -33,7 +56,8 @@ func main() {
 	}
 
 	for _, row := range rows {
-		fmt.Println(row[id], row[name], row[lastName], row[email])
+		p := NewPerson(row)
+		fmt.Println(p.ID, p.FullName(), p.Email)
 	}
 
 }
